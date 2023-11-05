@@ -2,7 +2,165 @@
 title: "Wordle First Letter Frequency Heat Map on a Keyboard"
 subtitle: "Coding out loud, Ep 4"
 author: "Sara Oberle (following Dr. Mine Çetinkaya-Rundel & Martha Aboagye)"
-output: github_document
+output: pdf_document
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
+
+```{r}
+#| label: load-packages
+library(tidyverse)
+library(ggkeyboard) # https://github.com/sharlagelfand/ggkeyboard
+```
+
+```{r}
+#| label: read-csv
+wordle <- read_csv("https://raw.githubusercontent.com/tabatkins/wordle-list/main/words", col_names = "word")
+```
+
+## Inspiration
+
+[English keyboard heatmap](https://twitter.com/monachalabi/status/772102591694209024) by [Mona Chalabi](https://twitter.com/MonaChalabi)
+
+## Task 1: Find the first letter of Wordle words
+
+```{r}
+#| label: first-letter
+wordle <- wordle |>
+  mutate(first_letter = str_sub(word, start = 1, end = 1))
+```
+
+```{r}
+#| label: count-first-letter
+wordle_counts <- wordle |>
+  count(first_letter, sort = TRUE)
+```
+
+From <https://github.com/tabatkins/wordle-list>.
+
+## Task 2: Draw a keyboard
+
+```{r}
+ggkeyboard()
+```
+
+```{r}
+#| label: ggkeyboard 
+ggkeyboard(tkl, layout = "iso")
+```
+
+## Task 3: Color keyboard keys based on frequency of first letter
+
+### Color options
+dark blue - "#2D669B" - 0
+light blue - "#359CA8" - 20
+green - "#B8C222" - 189
+yellow - "#EEDD49" - 325
+orange - "#F2BC4A" - 595
+dark orange - "#FB704A" - > 736
+red - "#BE372C" - > 1000
+
+### Color scale
+```{r}
+#| label: summary-stats
+wordle_counts |>
+  summarize(
+    min = min(n),
+    max = max(n),
+    mean = mean(n),
+    sd = sd(n), 
+    q20 = quantile(n, 0.20), 
+    q40 = quantile(n, 0.40),
+    q60 = quantile(n, 0.60),
+    q80 = quantile(n, 0.80)
+  ) 
+```
+
+```{r}
+#| label: wordle-counts 
+wordle_counts |>
+  ggplot(aes(x = n)) +
+  geom_histogram(binwidth = 100)
+```
+
+```{r}
+#| label: geom-col
+wordle_counts |>
+  ggplot(aes(x = first_letter , y = n)) +
+  geom_col() +
+  geom_hline(yintercept = 80)
+```
+
+dark blue - "#2D669B" - 0
+light blue - "#359CA8" - 20
+green - "#B8C222" - 189
+yellow - "#EEDD49" - 325
+orange - "#F2BC4A" - 595
+dark orange - "#FB704A" - > 736
+red - "#BE372C" - > 1000
+
+```{r}
+#| label: case-when-colors
+wordle_counts <- wordle_counts |>
+  mutate(
+    color = case_when(
+    n == 0                  ~ "#2D669B",
+    n <= 20                 ~ "#359CA8", 
+    n > 20 & n <= 189       ~ "#B8C222", 
+    n > 189 & n <= 325      ~ "#EEDD49", 
+    n > 325 & n <= 595      ~ "#F2BC4A", 
+    n > 595 & n <= 1000     ~ "#FB704A", 
+    n > 1000                ~ "#BE372C"
+  ), 
+  first_letter = str_to_upper(first_letter)
+  )
+wordle_counts
+```
+
+
+```{r}
+#| label: test1
+ggkeyboard(sixty_percent, palette = keyboard_palette("magic")) |>
+  highlight_keys(
+    keys = c("Z", "X", "C", "V"), 
+    fill = c("red", "pink", "orange", "blue"), 
+    alpha = 0.7, 
+    colour = NA
+    )
+```
+
+```{r}
+#| label: test2 
+ggkeyboard(sixty_percent, palette = keyboard_palette("magic")) |>
+  highlight_keys(
+    keys = c("C", "N", "S"), 
+    fill = c("red", "pink", "orange"), 
+    alpha = 0.7, 
+    colour = NA
+    )
+```
+
+
+```{r} 
+#| label: read-keys-csv
+keys <- read_csv("https://raw.githubusercontent.com/sharlagelfand/ggkeyboard/061f0d9084d76d576200e81439311983e1d50d93/data-raw/sixty_percent.csv")
+```
+
+
+```{r}
+#| label: wordle-counts-ordered
+wordle_counts_ordered <- keys %>% 
+  filter(key_label %in% LETTERS) %>%
+  select(key) %>%
+  left_join(wordle_counts, by = c("key" = "first_letter"))
+```
+
+```{r}
+#| label: keyboard-output
+ggkeyboard(sixty_percent, palette = keyboard_palette("magic")) %>%
+  highlight_keys(
+    keys = wordle_counts_ordered$key, 
+    fill = wordle_counts_ordered$color, 
+    alpha = 0.7, 
+    colour = NA
+    )

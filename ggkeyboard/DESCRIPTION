@@ -1,0 +1,29 @@
+Package: ggkeyboard
+Title: Plot a Keyboard Using "ggplot2"
+Version: 0.0.0.9012
+Authors@R: 
+    person(given = "Sharla",
+           family = "Gelfand",
+           role = c("aut", "cre"),
+           email = "sharla.gelfand@gmail.com")
+Description: Plot a keyboard using ggplot2.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Depends: 
+    R (>= 2.10)
+Imports: 
+    magrittr,
+    dplyr,
+    stringr,
+    prismatic,
+    ggplot2,
+    ggforce,
+    tibble,
+    purrr
+Suggests: 
+    testthat,
+    scales,
+    vdiffr
