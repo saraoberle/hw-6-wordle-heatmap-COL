@@ -41,13 +41,10 @@ From <https://github.com/tabatkins/wordle-list>.
 ## Task 2: Draw a keyboard
 
 ```{r}
-ggkeyboard()
-```
-
-```{r}
 #| label: ggkeyboard 
 ggkeyboard(tkl, layout = "iso")
 ```
+
 
 ## Task 3: Color keyboard keys based on frequency of first letter
 
@@ -101,7 +98,7 @@ red - "#BE372C" - > 1000
 
 ```{r}
 #| label: case-when-colors
-wordle_counts <- wordle_counts |>
+wordle_counts <- wordle_counts %>%
   mutate(
     color = case_when(
     n == 0                  ~ "#2D669B",
@@ -110,7 +107,8 @@ wordle_counts <- wordle_counts |>
     n > 189 & n <= 325      ~ "#EEDD49", 
     n > 325 & n <= 595      ~ "#F2BC4A", 
     n > 595 & n <= 1000     ~ "#FB704A", 
-    n > 1000                ~ "#BE372C"
+    n > 1000                ~ "#BE372C", 
+    TRUE ~ as.character(color)
   ), 
   first_letter = str_to_upper(first_letter)
   )
@@ -120,12 +118,14 @@ wordle_counts
 
 ```{r}
 #| label: test1
+wordle_counts_ordered |>
 ggkeyboard(sixty_percent, palette = keyboard_palette("magic")) |>
   highlight_keys(
     keys = c("Z", "X", "C", "V"), 
-    fill = c("red", "pink", "orange", "blue"), 
+    fill = c("#B8C222", "#359CA8", "#FB704A", "#EEDD49"), 
     alpha = 0.7, 
-    colour = NA
+    colour = NA, 
+    TRUE ~ as.character(keys)
     )
 ```
 
