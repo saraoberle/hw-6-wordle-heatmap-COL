@@ -1,0 +1,8 @@
+---
+title: "Wordle First Letter Frequency Heat Map on a Keyboard"
+subtitle: "Coding out loud, Ep 4"
+author: "Sara Oberle (following Dr. Mine Çetinkaya-Rundel & Martha Aboagye)"
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
