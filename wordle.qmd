@@ -107,8 +107,7 @@ wordle_counts <- wordle_counts %>%
     n > 189 & n <= 325      ~ "#EEDD49", 
     n > 325 & n <= 595      ~ "#F2BC4A", 
     n > 595 & n <= 1000     ~ "#FB704A", 
-    n > 1000                ~ "#BE372C", 
-    TRUE ~ as.character(color)
+    n > 1000                ~ "#BE372C"
   ), 
   first_letter = str_to_upper(first_letter)
   )
